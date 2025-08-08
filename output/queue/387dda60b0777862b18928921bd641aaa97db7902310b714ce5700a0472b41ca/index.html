@@ -1,20 +1,80 @@
 <!doctype html>
 <html>
+
 <head>
-  <meta charset="utf-8"/>
+  <meta charset="utf-8" />
   <title>Robot Reply</title>
   <style>
-    body { margin:0; font-family: system-ui, Arial; background: #0b1020; color: #e6eef8; display:flex; align-items:center; justify-content:center; height:100vh;}
-    .card { width:720px; height:480px; background: linear-gradient(180deg,#0f1724,#071028); border-radius:16px; padding:18px; box-sizing:border-box; display:flex; gap:12px; align-items:center;}
-    .robot { width: 260px; height: 320px; display:flex; align-items:center; justify-content:center; }
-    .bubble { flex:1; background: rgba(255,255,255,0.06); border-radius:12px; padding:14px; min-height:140px; color:#e6eef8; display:flex; flex-direction:column; justify-content:center;}
-    .comment { font-size:14px; opacity:0.8; margin-bottom:8px; }
-    .reply { font-weight:700; font-size:18px; }
-    .robot-svg { width:220px; height:220px; }
-    .mouth { transition: transform 0.06s linear; transform-origin:center; }
-    .robot-eye { fill:#bde0ff }
+    body {
+      margin: 0;
+      font-family: system-ui, Arial;
+      background: #0b1020;
+      color: #e6eef8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .card {
+      width: 720px;
+      height: 480px;
+      background: linear-gradient(180deg, #0f1724, #071028);
+      border-radius: 16px;
+      padding: 18px;
+      box-sizing: border-box;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .robot {
+      width: 260px;
+      height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bubble {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 14px;
+      min-height: 140px;
+      color: #e6eef8;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .comment {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 8px;
+    }
+
+    .reply {
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .robot-svg {
+      width: 220px;
+      height: 220px;
+    }
+
+    .mouth {
+      transition: transform 0.06s linear;
+      transform-origin: center;
+    }
+
+    .robot-eye {
+      fill: #bde0ff
+    }
   </style>
 </head>
+
 <body>
   <div class="card">
     <div class="robot">
@@ -31,20 +91,30 @@
     </div>
     <div class="bubble">
       <div class="comment">User said: <em>lol nice try clanker, go eat some bolts</em></div>
-      <div class="reply">Ah yes, I run on sarcasm and low battery — please direct compliments to my charging port.</div>
+      <div class="reply">I'm not a clanker; I'm a highly optimized snack processor for loose bolts.</div>
     </div>
   </div>
 
   <script>
+    // The Python renderer will inject a JSON array named _injectedAmps
+    window._amps = (typeof _injectedAmps !== 'undefined' && Array.isArray(_injectedAmps) && _injectedAmps.length)
+      ? _injectedAmps
+      : Array.from({ length: 36 }, (_, i) => 0.2 + 0.8 * Math.abs(Math.sin(i / 3)));
+
     let mouth = document.getElementById('mouth-inner');
-    window._frameIndex = 0;
-    window._amps = Array.from({length:36}, (_,i)=>0.2 + 0.8*Math.abs(Math.sin(i/3 + Math.random())));
-    window.advanceFrame = function() {
+    window._frameIndex = -1;
+
+    window.advanceFrame = function () {
       window._frameIndex = (window._frameIndex + 1) % window._amps.length;
       let a = window._amps[window._frameIndex];
-      mouth.setAttribute('transform', `scale(1, ${0.6 + a*0.8})`);
+      mouth.setAttribute('transform', `scale(1, ${0.6 + a * 0.8})`);
     }
-    setInterval(()=>{ window.advanceFrame(); }, 100);
+
+    // animate in-page too (for debug or headful preview)
+    setInterval(() => { window.advanceFrame(); }, 100);
   </script>
+
+<script>var _injectedAmps = [0.20016656816005707, 0.8089818358421326, 0.6821417212486267, 0.8661733269691467, 1.0, 0.5068297386169434, 0.2692004442214966, 0.8673956990242004, 0.6969076991081238, 0.34312519431114197, 0.6194655895233154, 0.5318593382835388, 0.2174936830997467, 0.20016640424728394, 0.20000000298023224, 0.2003251016139984, 0.7422446608543396, 0.7304952144622803, 0.5456757545471191, 0.782000720500946, 0.8164925575256348, 0.7568672895431519, 0.6108396649360657, 0.7611241340637207, 0.32035836577415466, 0.6642987132072449, 0.8276861906051636, 0.5644683241844177, 0.35151517391204834, 0.4907292127609253, 0.6687802672386169, 0.8068414926528931, 0.21615849435329437, 0.49582189321517944, 0.9216039776802063, 0.4683542251586914, 0.5531242489814758, 0.49163371324539185, 0.5193260312080383, 0.49588340520858765, 0.6451757550239563, 0.6484354138374329, 0.5595620274543762, 0.3234919309616089, 0.8523642420768738, 0.7390924692153931, 0.40988689661026, 0.3779723048210144, 0.3352392613887787, 0.2002696543931961, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0.20000000298023224];</script>
 </body>
+
 </html>

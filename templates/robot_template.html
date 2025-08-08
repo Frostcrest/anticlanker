@@ -1,20 +1,80 @@
 <!doctype html>
 <html>
+
 <head>
-  <meta charset="utf-8"/>
+  <meta charset="utf-8" />
   <title>Robot Reply</title>
   <style>
-    body { margin:0; font-family: system-ui, Arial; background: #0b1020; color: #e6eef8; display:flex; align-items:center; justify-content:center; height:100vh;}
-    .card { width:720px; height:480px; background: linear-gradient(180deg,#0f1724,#071028); border-radius:16px; padding:18px; box-sizing:border-box; display:flex; gap:12px; align-items:center;}
-    .robot { width: 260px; height: 320px; display:flex; align-items:center; justify-content:center; }
-    .bubble { flex:1; background: rgba(255,255,255,0.06); border-radius:12px; padding:14px; min-height:140px; color:#e6eef8; display:flex; flex-direction:column; justify-content:center;}
-    .comment { font-size:14px; opacity:0.8; margin-bottom:8px; }
-    .reply { font-weight:700; font-size:18px; }
-    .robot-svg { width:220px; height:220px; }
-    .mouth { transition: transform 0.06s linear; transform-origin:center; }
-    .robot-eye { fill:#bde0ff }
+    body {
+      margin: 0;
+      font-family: system-ui, Arial;
+      background: #0b1020;
+      color: #e6eef8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .card {
+      width: 720px;
+      height: 480px;
+      background: linear-gradient(180deg, #0f1724, #071028);
+      border-radius: 16px;
+      padding: 18px;
+      box-sizing: border-box;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .robot {
+      width: 260px;
+      height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bubble {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 14px;
+      min-height: 140px;
+      color: #e6eef8;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .comment {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 8px;
+    }
+
+    .reply {
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .robot-svg {
+      width: 220px;
+      height: 220px;
+    }
+
+    .mouth {
+      transition: transform 0.06s linear;
+      transform-origin: center;
+    }
+
+    .robot-eye {
+      fill: #bde0ff
+    }
   </style>
 </head>
+
 <body>
   <div class="card">
     <div class="robot">
@@ -36,15 +96,24 @@
   </div>
 
   <script>
+    // The Python renderer will inject a JSON array named _injectedAmps
+    window._amps = (typeof _injectedAmps !== 'undefined' && Array.isArray(_injectedAmps) && _injectedAmps.length)
+      ? _injectedAmps
+      : Array.from({ length: 36 }, (_, i) => 0.2 + 0.8 * Math.abs(Math.sin(i / 3)));
+
     let mouth = document.getElementById('mouth-inner');
-    window._frameIndex = 0;
-    window._amps = Array.from({length:36}, (_,i)=>0.2 + 0.8*Math.abs(Math.sin(i/3 + Math.random())));
-    window.advanceFrame = function() {
+    window._frameIndex = -1;
+
+    window.advanceFrame = function () {
       window._frameIndex = (window._frameIndex + 1) % window._amps.length;
       let a = window._amps[window._frameIndex];
-      mouth.setAttribute('transform', `scale(1, ${0.6 + a*0.8})`);
+      mouth.setAttribute('transform', `scale(1, ${0.6 + a * 0.8})`);
     }
-    setInterval(()=>{ window.advanceFrame(); }, 100);
+
+    // animate in-page too (for debug or headful preview)
+    setInterval(() => { window.advanceFrame(); }, 100);
   </script>
+
 </body>
+
 </html>
