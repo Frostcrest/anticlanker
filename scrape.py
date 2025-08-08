@@ -3,34 +3,22 @@ import os
 import re
 import json
 import time
-import yaml
 from pathlib import Path
 from datetime import datetime, timezone
 
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from webdriver_manager.chrome import ChromeDriverManager
+from common import load_config, ensure_dirs, queue_dir, sha256, get_chrome_driver
 
-CONFIG_PATH = "config.yaml"
-STATE_FILE = "output/seen_comments.json"
+STATE_FILE = str((Path(__file__).parent / "output/seen_comments.json").resolve())
 
 
 # ---------- Config / FS helpers ----------
-def load_config():
-    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
-
-
-def ensure_dirs(cfg):
-    out = Path(cfg["output_dir"])
-    (out / "queue").mkdir(parents=True, exist_ok=True)
-    (out / "published").mkdir(parents=True, exist_ok=True)
+def _load_cfg():
+    return load_config() or {}
 
 
 def load_seen():
@@ -48,49 +36,18 @@ def save_seen(seen):
 
 
 def hash_text(s: str) -> str:
-    import hashlib
-    return hashlib.sha256(s.encode("utf-8")).hexdigest()
+    return sha256(s)
 
 
 # ---------- WebDriver ----------
 def get_driver():
-    from selenium import webdriver
-    from selenium.webdriver.chrome.options import Options
-    from selenium.webdriver.chrome.service import Service
-    from webdriver_manager.chrome import ChromeDriverManager
-
-    opts = Options()
-    # HEADFUL (comment out the next line)
-    # opts.add_argument("--headless=new")
-
-    # Window big enough for TikTok layout
-    opts.add_argument("--window-size=1280,2000")
-
-    # Keep GPU ON in headful; it’s more stable for WebGL
-    # opts.add_argument("--disable-gpu")  # <— leave this commented in headful
-
-    # Anti-automation noise reducers
-    opts.add_argument("--disable-blink-features=AutomationControlled")
-    opts.add_argument("--lang=en-US")
-    opts.add_argument("--mute-audio")
-    opts.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                      "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36")
-
-    # Optional: reuse your Chrome profile (often helps TikTok render)
-    # opts.add_argument(r"--user-data-dir=C:\Users\<YOU>\AppData\Local\Google\Chrome\User Data")
-    # opts.add_argument("--profile-directory=Default")
-
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=opts)
-
+    driver = get_chrome_driver(headless=False, window_size="1280,2000")
     try:
         driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
             "source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
         })
     except Exception:
         pass
-
-    driver.set_page_load_timeout(60)
     return driver
 
 # ---------- Scraping ----------
@@ -200,7 +157,7 @@ def matches_keyword(cfg, comment_text):
 
 # ---------- Main ----------
 def main_once():
-    cfg = load_config()
+    cfg = _load_cfg()
     ensure_dirs(cfg)
     seen = load_seen()
     driver = get_driver()
@@ -229,7 +186,7 @@ def main_once():
                         "matched_pattern": str(pattern),
                         "timestamp": c["scraped_at"],
                     }
-                    qpath = Path(cfg["output_dir"]) / "queue" / f"{h}.json"
+                    qpath = queue_dir(cfg) / f"{h}.json"
                     with open(qpath, "w", encoding="utf-8") as f:
                         json.dump(out, f, indent=2, ensure_ascii=False)
                 seen.add(h)

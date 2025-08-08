@@ -1,14 +1,12 @@
 # run_reply.py
-import os, sys, subprocess, hashlib
+import os, sys, subprocess
 from pathlib import Path
 import time
+from common import sha256, queue_dir
 
 def run_py(script, *args):
     cmd = [sys.executable, script, *args]
     subprocess.check_call(cmd)
-
-def sha(s: str) -> str:
-    return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 def open_file(path: Path):
     try:
@@ -59,8 +57,8 @@ def main():
     run_py("render_video.py")
 
     # Locate output and open it
-    h = sha(comment)
-    mp4 = Path("output/queue") / h / f"{h}.mp4"
+    h = sha256(comment)
+    mp4 = queue_dir() / h / f"{h}.mp4"
     if mp4.exists() and mp4.stat().st_size > 0:
         print(f"✅ Done. {mp4}")
         # auto-open

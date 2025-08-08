@@ -3,42 +3,29 @@ import json, os, time, subprocess
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 
 from synth_audio import synth_to_wav
 from audio_envelope import audio_to_envelope
+from common import get_chrome_driver, ffmpeg_bin, queue_dir, get_logger
 
 TEMPLATE_DIR = "templates"
-QUEUE_DIR = Path("output/queue")
+QUEUE_DIR = queue_dir()
 HEADLESS = os.getenv("HEADLESS", "false").lower() in ("1","true","yes")
-FFMPEG_BIN = os.getenv("FFMPEG_BIN", "ffmpeg")
+FFMPEG_BIN = ffmpeg_bin()
 FPS = 12
 FRAME_COUNT = 72  # ~6s @ 12fps; bump for longer clips
 
-def log(*a): print("[render]", *a, flush=True)
+logger = get_logger("render")
+
+def log(*a):
+    logger.info(" ".join(str(x) for x in a))
 
 def get_driver():
-    opts = Options()
-    if HEADLESS:
-        opts.add_argument("--headless=new")
-        opts.add_argument("--enable-unsafe-swiftshader")
-        opts.add_argument("--use-gl=swiftshader")
-        opts.add_argument("--disable-gpu")
-    opts.add_argument("--window-size=900,600")
-    opts.add_argument("--disable-dev-shm-usage")
-    opts.add_argument("--no-sandbox")
-    opts.add_argument("--lang=en-US")
-    opts.add_argument("--disable-blink-features=AutomationControlled")
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=opts)
-    driver.set_page_load_timeout(60)
-    return driver
+    # Delegate to common for consistent setup
+    return get_chrome_driver(headless=HEADLESS, window_size="900,600")
 
 def render_html_for_reply(q, amps):
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))

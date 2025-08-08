@@ -1,10 +1,8 @@
 # enqueue_comment_min.py
-import json, sys, hashlib
+import json, sys
 from pathlib import Path
 from datetime import datetime, timezone
-
-def hash_text(s: str) -> str:
-    return hashlib.sha256(s.encode("utf-8")).hexdigest()
+from common import sha256, queue_dir
 
 def main():
     if len(sys.argv) < 2:
@@ -13,11 +11,11 @@ def main():
 
     comment = sys.argv[1].strip()
     source_url = sys.argv[2] if len(sys.argv) > 2 else "manual://test"
-    output_dir = Path(sys.argv[3]) if len(sys.argv) > 3 else Path("./output/queue")
+    output_dir = Path(sys.argv[3]) if len(sys.argv) > 3 else queue_dir()
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    cid = hash_text(comment)
+    cid = sha256(comment)
     payload = {
         "id": cid,
         "url": source_url,

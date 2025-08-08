@@ -1,9 +1,11 @@
 from flask import Flask, render_template_string, send_file, redirect, url_for
 import glob, json, os, shutil, pathlib
+from common import queue_dir, published_dir, get_logger
 
 app = Flask(__name__)
-QUEUE_DIR = "output/queue"
-PUBLISHED = "output/published"
+QUEUE_DIR = str(queue_dir())
+PUBLISHED = str(published_dir())
+log = get_logger("server").info
 
 INDEX_TMPL = """<!doctype html><html><body>
 <h2>Moderation Queue</h2>

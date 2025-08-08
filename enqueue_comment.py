@@ -1,25 +1,9 @@
 # enqueue_comment.py
-import json, sys, hashlib
+import json, sys
 from pathlib import Path
 from datetime import datetime, timezone
 
-CONFIG_PATH = "config.yaml"
-
-def sha(s: str) -> str:
-    import hashlib
-    return hashlib.sha256(s.encode("utf-8")).hexdigest()
-
-def load_output_dir():
-    """Try config.yaml; if anything fails, use ./output/queue"""
-    try:
-        import yaml
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            cfg = yaml.safe_load(f) or {}
-        out = Path(cfg.get("output_dir", "./output")) / "queue"
-    except Exception:
-        out = Path("./output") / "queue"
-    out.mkdir(parents=True, exist_ok=True)
-    return out
+from common import queue_dir, sha256
 
 def main():
     if len(sys.argv) < 2:
@@ -40,10 +24,10 @@ def main():
         if idx + 1 < len(args):
             out_dir_override = Path(args[idx+1])
 
-    out_dir = out_dir_override or load_output_dir()
+    out_dir = out_dir_override or queue_dir()
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    cid = sha(comment)
+    cid = sha256(comment)
     payload = {
         "id": cid,
         "url": source_url,

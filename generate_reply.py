@@ -22,8 +22,10 @@ import random
 import argparse
 import textwrap
 
-CONFIG_PATH = "config.yaml"
-QUEUE_DIR = Path("output/queue")
+from common import load_config, queue_dir, get_logger
+
+QUEUE_DIR = queue_dir()
+logger = get_logger("generate")
 
 # ---------- Fallback responses if no LLM / config ----------
 FALLBACKS = {
@@ -49,14 +51,10 @@ FALLBACKS = {
     ],
 }
 
-def load_config():
-    cfg = {}
-    try:
-        import yaml
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            cfg = yaml.safe_load(f) or {}
-    except Exception as e:
-        print(f"[generate] Note: could not read {CONFIG_PATH}: {e}")
+def _load_cfg():
+    cfg = load_config()
+    if not cfg:
+        logger.info("No or empty config.yaml; using defaults")
     return cfg
 
 def available_tone_ids(cfg):
@@ -185,7 +183,7 @@ def main():
     parser.add_argument("--overwrite", action="store_true", help="Regenerate even if reply_text exists")
     args = parser.parse_args()
 
-    cfg = load_config()
+    cfg = _load_cfg()
     tone_id = resolve_tone(cfg, args.tone)
 
     if not QUEUE_DIR.exists():
