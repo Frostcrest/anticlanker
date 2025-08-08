@@ -1,6 +1,8 @@
 targets:
-  - url: "https://www.tiktok.com/@somecreator/video/XXXXXXXXXXXX"
+  - url: "https://www.tiktok.com/@thebarkmore/video/7532867321833032991"
+
 poll_interval_seconds: 300
+
 keywords:
   - clanker
   - bolt eater
@@ -8,10 +10,12 @@ keywords:
   - wireback
   - robot
   - bot
+
 regex_variations:
-  - "(?i)clank(er|y|ers)?"
-  - "(?i)bolt\s*eater"
-  - "(?i)wire\s*back"
+  - '(?i)clank(er|y|ers)?'
+  - '(?i)bolt\s*eater'
+  - '(?i)wire\s*back'
+
 tone_profiles:
   - id: satirical
     description: "Witty, light teasing"
@@ -25,6 +29,7 @@ tone_profiles:
   - id: dry
     description: "Deadpan"
     prompt_template: "You are a robot, deadpan. Respond to '{comment}' in <=20 words."
+
 fallback_tone: satirical
 output_dir: "./output"
 use_openai: false

@@ -1,8 +1,14 @@
+# synth_audio.py
 import pyttsx3, os
 from pathlib import Path
-from pydub import AudioSegment
 
 def synth_to_wav(text, out_path, rate=180, voice_name=None):
+    """
+    Generate a WAV file via pyttsx3 only (no pydub/ffmpeg dependency).
+    """
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
     engine = pyttsx3.init()
     engine.setProperty('rate', rate)
     if voice_name:
@@ -11,18 +17,17 @@ def synth_to_wav(text, out_path, rate=180, voice_name=None):
             if voice_name.lower() in v.name.lower():
                 engine.setProperty('voice', v.id)
                 break
+
     tmp = str(out_path) + ".tmp.wav"
     engine.save_to_file(text, tmp)
     engine.runAndWait()
-    audio = AudioSegment.from_wav(tmp)
-    audio.export(str(out_path), format="wav")
-    os.remove(tmp)
+
+    # Move temp wav to final path
+    if os.path.exists(tmp):
+        os.replace(tmp, str(out_path))
     return out_path
 
 if __name__ == "__main__":
-    import sys
-    t = " ".join(sys.argv[1:]) if len(sys.argv)>1 else "Hello world"
-    out = Path("output/sample.wav")
-    out.parent.mkdir(parents=True, exist_ok=True)
-    synth_to_wav(t, out)
-    print("Saved", out)
+    p = Path("output/sample.wav")
+    synth_to_wav("Hello from the robot.", p)
+    print("Saved", p)
