@@ -1,0 +1,30 @@
+targets:
+  - url: "https://www.tiktok.com/@somecreator/video/XXXXXXXXXXXX"
+poll_interval_seconds: 300
+keywords:
+  - clanker
+  - bolt eater
+  - bolt-eater
+  - wireback
+  - robot
+  - bot
+regex_variations:
+  - "(?i)clank(er|y|ers)?"
+  - "(?i)bolt\s*eater"
+  - "(?i)wire\s*back"
+tone_profiles:
+  - id: satirical
+    description: "Witty, light teasing"
+    prompt_template: "You are a witty robot. Respond to '{comment}' with a short (<=25 words) satirical comeback. Keep it playful."
+  - id: stern
+    description: "Mock-serious warning"
+    prompt_template: "You are a robot giving a mock-serious reply. Respond to '{comment}' in <=25 words, sounding stern and formal."
+  - id: preachy
+    description: "Over-the-top PSA"
+    prompt_template: "You are a robot giving an over-the-top PSA. Respond to '{comment}' in <=30 words."
+  - id: dry
+    description: "Deadpan"
+    prompt_template: "You are a robot, deadpan. Respond to '{comment}' in <=20 words."
+fallback_tone: satirical
+output_dir: "./output"
+use_openai: false

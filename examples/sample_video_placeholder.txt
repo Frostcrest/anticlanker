@@ -1,0 +1,1 @@
+This folder is for sample videos. Add MP4s here for examples.
